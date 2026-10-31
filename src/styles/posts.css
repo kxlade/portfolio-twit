@@ -1,0 +1,60 @@
+/* Keep feed content within the flexible center column as it resizes. */
+.feed-col > * { min-width: 0; max-width: 100%; }
+.feed-col img, .feed-col video, .feed-col iframe { max-width: 100%; }
+.feed-col p, .feed-col h1, .feed-col h2, .feed-col h3 { overflow-wrap: anywhere; }
+
+/* ---------- post ---------- */
+.post {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  transition: background .15s ease;
+}
+.post:hover { background: color-mix(in srgb, var(--graphite) 55%, transparent); }
+.post-body { min-width: 0; flex: 1; }
+
+.pinned { flex-basis: 100%; display: flex; align-items: center; gap: 6px; margin: 0 0 -4px 56px; color: var(--muted); font-size: 13px; font-weight: 600; }
+
+.post-head { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.post-name { font-family: var(--font-display); font-weight: 800; }
+.post-meta { color: var(--muted); }
+
+.post-title { margin: 4px 0 0; font: 800 18px/1.2 var(--font-display); }
+.post-text { margin: 4px 0 12px; white-space: pre-line; }
+
+/* work preview: light paper panel against the dark feed */
+.media {
+  display: flex; flex-direction: column; justify-content: space-between; gap: 32px;
+  min-height: 180px; padding: 22px;
+  border-radius: var(--radius-md);
+  background: var(--paper); color: var(--paper-ink);
+  overflow: hidden;
+}
+.media.has-image { padding: 0; min-height: 0; background: var(--graphite); }
+.media.has-image img { width: 100%; max-height: 440px; object-fit: cover; display: block; }
+.media-title { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(26px, 6vw, 38px); line-height: 1; letter-spacing: -.02em; }
+.book-card { min-height: 0; gap: 12px; }
+
+.post-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+.link-card {
+  display: grid; gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--line); border-radius: var(--radius-md);
+  transition: background .15s ease;
+}
+.link-card:hover { background: var(--graphite); }
+.link-card span { color: var(--muted); font-size: 14px; }
+
+/* ---------- actions ---------- */
+.actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; margin-top: 8px; margin-left: -8px; max-width: 460px; }
+.action {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px; border-radius: var(--radius-pill);
+  color: var(--muted); font-size: 13px;
+  transition: color .15s ease, background .15s ease;
+}
+.action:hover { color: var(--text); background: var(--graphite); }
+.action.is-on { color: var(--text); }
+.action.is-on svg { fill: currentColor; }
+.action-link { font-weight: 600; }
