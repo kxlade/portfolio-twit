@@ -40,7 +40,8 @@
 .sidebar-resize-handle {
   position: absolute;
   inset-block: 0;
-  inset-inline-end: -8px;
+  /* Center the visible drag line over the feed border after the shell gap. */
+  inset-inline-end: -32px;
   width: 16px;
   z-index: 20;
   cursor: ew-resize;
@@ -168,11 +169,15 @@
 
 .navbar {
   position: sticky;
-  top: 0;
-  z-index: 10;
+  top: -50px;
+  z-index: 100;
   background: color-mix(in srgb, var(--ink) 82%, transparent);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line);
+}
+
+.nav-logo{
+  text-align: center;
 }
 
 .navbar-top {
@@ -185,8 +190,9 @@
 .navbar-top .mark {
   width: 34px;
   height: 34px;
-  font-size: 16px;
+  font-size: 20px;
   border-radius: 10px;
+  text-align: center;
   margin: 0;
 }
 
@@ -414,6 +420,10 @@
     gap: 16px;
   }
 
+  .sidebar-resize-handle {
+    inset-inline-end: -24px;
+  }
+
   .rail {
     display: none;
   }
@@ -442,6 +452,8 @@
 
   .bottom-nav {
     display: flex;
+    flex-direction: row;
+    justify-content: space-between;
   }
 
   .bottom-nav a {

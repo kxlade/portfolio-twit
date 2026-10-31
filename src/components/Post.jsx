@@ -2,123 +2,151 @@ import { useState } from 'react'
 import Icon from './Icons'
 import { profile } from '../data/posts'
 
-const compact = new Intl.NumberFormat('en', { notation: 'compact' })
-
-// Relative time from post.date: now, 5m, 3h, 2d, then "Oct 30"
-function timeAgo(iso) {
-  const d = new Date(iso)
-  const mins = Math.floor((Date.now() - d.getTime()) / 60000)
-  if (mins < 1) return 'now'
-  if (mins < 60) return `${mins}m`
-  const hrs = Math.floor(mins / 60)
-  if (hrs < 24) return `${hrs}h`
-  const days = Math.floor(hrs / 24)
-  if (days < 7) return `${days}d`
-  const sameYear = d.getFullYear() === new Date().getFullYear()
-  return d.toLocaleDateString('en', { month: 'short', day: 'numeric', ...(sameYear ? {} : { year: 'numeric' }) })
-}
-
-// Placeholder engagement. Add `stats: { replies, reposts, likes, views }` to a post to override.
-function fakeStats(id) {
-  const n = Number(id) || 1
-  return { replies: (n * 3) % 9 + 1, reposts: (n * 5) % 7 + 1, likes: (n * 37) % 90 + 10, views: (n * 613) % 3000 + 400 }
-}
-
 function hostname(url) {
-  try { return new URL(url).hostname.replace(/^www\./, '') } catch { return url }
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return url
+  }
 }
 
-function ProjectMedia({ post }) {
-  const [failed, setFailed] = useState(false)
-  const showImage = post.image && !failed
+function ProjectPost({ post }) {
+  const [imageFailed, setImageFailed] = useState(false)
+  const hasImage = post.image && !imageFailed
+
   return (
     <>
-      <div className={`media${showImage ? ' has-image' : ''}`}>
-        {showImage
-          ? <img src={post.image} alt={`${post.title} screenshot`} loading="lazy" onError={() => setFailed(true)} />
-          : <h4 className="media-title">{post.title}</h4>}
+      <h2 className="post-title">{post.title}</h2>
+      <p className="post-text">{post.content}</p>
+      <div className={`project-preview${hasImage ? ' has-image' : ''}`}>
+        {hasImage
+          ? <img src={post.image} alt={`Screenshot of ${post.title}`} loading="lazy" onError={() => setImageFailed(true)} />
+          : <span>{post.title} · Screenshot not provided</span>}
       </div>
-      {post.technologies?.length > 0 && (
-        <div className="post-tags">
-          {post.technologies.map((t) => <span className="chip" key={t}>{t}</span>)}
-        </div>
+      <TagList tags={post.technologies} className="post-tags" />
+      <div className="post-links">
+        {post.live && <a className="btn post-cta" href={post.live} target="_blank" rel="noreferrer">Visit website</a>}
+        {post.github && <a className="post-text-link" href={post.github} target="_blank" rel="noreferrer">View source</a>}
+      </div>
+    </>
+  )
+}
+
+function TagList({ tags = [], className = 'post-tags' }) {
+  if (!tags.length) return null
+  return <div className={className}>{tags.map((tag) => <span className="chip" key={tag}>{tag}</span>)}</div>
+}
+
+function BookPost({ post }) {
+  return (
+    <div className="book-post">
+      <div className="book-heading">
+        <span className="book-kicker">Reading candidate</span>
+        <h2>{post.title}</h2>
+        <p>by {post.author}</p>
+      </div>
+      <div className="book-details">
+        <span><strong>Area</strong>{post.bookCategory}</span>
+        <span><strong>Reading status</strong>{post.readingStatus}</span>
+        <span><strong>Recommendation</strong>{post.recommendation}</span>
+      </div>
+      <p className="post-text">{post.subject}</p>
+      <div className="book-draft">
+        <strong>{post.reviewDraftLabel}</strong>
+        <p>{post.reviewDraft}</p>
+      </div>
+    </div>
+  )
+}
+
+function ResourcePost({ post }) {
+  return (
+    <>
+      <h2 className="post-title">{post.title}</h2>
+      {post.content && <p className="post-text">{post.content}</p>}
+      {post.whyUseful && <p className="post-text"><strong>Why it’s useful:</strong> {post.whyUseful}</p>}
+      <TagList tags={post.tags} />
+      {post.url && (
+        <a className="resource-preview" href={post.url} target="_blank" rel="noreferrer">
+          <span>{hostname(post.url)}</span>
+          <strong>Open resource ↗</strong>
+        </a>
       )}
     </>
   )
 }
 
-function Body({ post }) {
+function DevelopmentPost({ post }) {
+  return (
+    <>
+      {post.title && <h2 className="post-title">{post.title}</h2>}
+      {post.content && <p className="post-text">{post.content}</p>}
+      {post.whatLearned && <p className="post-text"><strong>Exploring:</strong> {post.whatLearned}</p>}
+      <TagList tags={post.tags} />
+    </>
+  )
+}
+
+function DevLogPost({ post }) {
+  const entries = [
+    ['Worked on', post.workedOn],
+    ['Learned', post.learned],
+    ['Challenge', post.challenge],
+    ['Next', post.nextExplore],
+  ].filter(([, value]) => value)
+
+  return (
+    <>
+      {post.title && <h2 className="post-title">{post.title}</h2>}
+      {post.content && <p className="post-text">{post.content}</p>}
+      <dl className="dev-log-details">
+        {entries.map(([label, value]) => (
+          <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
+        ))}
+      </dl>
+    </>
+  )
+}
+
+function PostContent({ post }) {
   switch (post.type) {
     case 'project':
-      return (
-        <>
-          <h3 className="post-title">{post.title}</h3>
-          <p className="post-text">{post.content}</p>
-          <ProjectMedia post={post} />
-        </>
-      )
+      return <ProjectPost post={post} />
     case 'book':
-      return (
-        <>
-          <p className="post-text">{post.content}</p>
-          <div className="media book-card">
-            <h4 className="media-title">{post.title}</h4>
-            <span>by {post.author}</span>
-          </div>
-        </>
-      )
+      return <BookPost post={post} />
     case 'resource':
-      return (
-        <>
-          <p className="post-text">{post.content}</p>
-          <a className="link-card" href={post.link} target="_blank" rel="noreferrer">
-            <strong>{post.title}</strong>
-            <span>{hostname(post.link)}</span>
-          </a>
-        </>
-      )
-    default: // 'thought' and anything else
-      return <p className="post-text">{post.content}</p>
+      return <ResourcePost post={post} />
+    case 'development':
+      return <DevelopmentPost post={post} />
+    case 'dev-log':
+      return <DevLogPost post={post} />
+    case 'thought':
+    default:
+      return <p className="post-text thought-text">{post.content}</p>
   }
 }
 
 export default function Post({ post }) {
-  const [liked, setLiked] = useState(false)
-  const stats = post.stats ?? fakeStats(post.id)
+  const postType = {
+    'dev-log': 'Dev Log',
+    development: 'Development',
+    project: 'Project',
+    thought: 'Thought',
+    book: 'Book',
+    resource: 'Resource',
+  }[post.type] || 'Post'
 
   return (
-    <article className={`post${post.pinned ? ' is-pinned' : ''}`}>
-      {post.pinned && (
-        <div className="pinned"><Icon name="pin" size={14} /> Pinned</div>
-      )}
-
+    <article className={`post post-${post.type}${post.pinned ? ' is-pinned' : ''}`}>
       <div className="avatar" aria-hidden="true">{profile.handle[0]}</div>
-
       <div className="post-body">
+        {post.pinned && <div className="pinned"><Icon name="pin" size={14} /> Pinned</div>}
         <div className="post-head">
           <span className="post-name">{profile.name}</span>
-          <span className="post-meta">@{profile.handle} · {timeAgo(post.date)}</span>
+          <span className="post-meta">@{profile.handle} · {postType} · {post.timestamp || post.subcategory || post.category}</span>
         </div>
-
-        <Body post={post} />
-
-        <div className="actions">
-          <span className="action"><Icon name="reply" size={18} />{compact.format(stats.replies)}</span>
-          <span className="action"><Icon name="repost" size={18} />{compact.format(stats.reposts)}</span>
-          <button
-            type="button"
-            className={`action${liked ? ' is-on' : ''}`}
-            aria-pressed={liked}
-            aria-label="Like"
-            onClick={() => setLiked((v) => !v)}
-          >
-            <Icon name="heart" size={18} />
-            {compact.format(stats.likes + (liked ? 1 : 0))}
-          </button>
-          <span className="action"><Icon name="chart" size={18} />{compact.format(stats.views)}</span>
-          {post.live && <a className="action action-link" href={post.live} target="_blank" rel="noreferrer">Live</a>}
-          {post.github && <a className="action action-link" href={post.github} target="_blank" rel="noreferrer">Code</a>}
-        </div>
+        {post.draft && <span className="post-draft-badge">Draft copy</span>}
+        <PostContent post={post} />
       </div>
     </article>
   )

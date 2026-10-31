@@ -5,16 +5,32 @@ import { posts } from '../data/posts'
 
 export default function Home() {
   const [active, setActive] = useState('All')
+  const [activeBuildFilter, setActiveBuildFilter] = useState(null)
 
-  // pinned post always first, then newest
-  const visible = [...posts]
-    .filter((p) => active === 'All' || p.category === active || p.pinned)
-    .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || new Date(b.date) - new Date(a.date))
+  const changeCategory = (category) => {
+    setActive(category)
+    setActiveBuildFilter(null)
+  }
+
+  const visible = posts
+    .filter((post) => active === 'All' || post.category === active)
+    .filter((post) => active !== 'Builds' || !activeBuildFilter || post.subcategory === activeBuildFilter)
+    .map((post, index) => ({ post, index }))
+    .sort((a, b) => {
+      if (active !== 'All' && a.post.pinned !== b.post.pinned) return a.post.pinned ? -1 : 1
+      return a.post.order - b.post.order || a.index - b.index
+    })
+    .map(({ post }) => post)
 
   return (
     <>
-      <Navbar active={active} onChange={setActive} />
-      <PostFeed posts={visible} />
+      <Navbar
+        active={active}
+        onChange={changeCategory}
+        activeBuildFilter={activeBuildFilter}
+        onBuildFilterChange={setActiveBuildFilter}
+      />
+      <PostFeed posts={visible} category={active} />
     </>
   )
 }
