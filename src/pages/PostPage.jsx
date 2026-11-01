@@ -41,7 +41,7 @@ export default function PostPage() {
       <Post post={post} detail />
       <section className="discussion-placeholder" aria-labelledby="discussion-title">
         <h2 id="discussion-title">Discussion</h2>
-        <p>Comments will be available when this portfolio is connected to its backend.</p>
+        <p>Comments will be available soon!</p>
       </section>
     </section>
   )
