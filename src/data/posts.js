@@ -1,7 +1,3 @@
-import origamiImage from '../assets/Origami-Screenshot.png'
-import collegeImage from '../assets/College-Screenshot.png'
-import petAdoptionImage from '../assets/Pet-Adoption-Screenshot.png'
-import resturantImage from '../assets/Resturant.png'
 import { bookCandidates } from './books'
 
 export const profile = {
@@ -17,79 +13,9 @@ export const profile = {
 export const categories = ['All', 'Builds', 'Personal', 'Reading', 'Learning', 'Dev Log']
 export const buildSubcategories = ['Web', 'Backend', 'Full-stack', 'Case Studies']
 
-// Keep UI components independent from the current in-memory data source.
-export function getPosts() { return posts }
-export function getPostBySlug(slug) { return posts.find((post) => post.slug === slug) }
-
-// Keep order explicit: no invented publication dates are needed for this portfolio feed.
-const projects = [
-  {
-    id: 'origami-for-all', slug: 'origami-for-all',
-    publishedAt: '2026-10-18', timestamp: 'Oct 18',
-    type: 'project',
-    category: 'Builds',
-    subcategory: 'Web',
-    tags: ['React', 'Vite', 'CSS'],
-    title: 'OrigamiForAll',
-    content: 'An origami website made to share the art of paper folding. Built with React, Vite, and CSS.',
-    image: origamiImage,
-    technologies: ['React', 'Vite', 'CSS'],
-    liveUrl: 'https://origami-folder.vercel.app/',
-    githubUrl: '',
-    pinned: true,
-    order: 1,
-  },
-  {
-    id: 'college-website', slug: 'college-website',
-    publishedAt: '2026-06-16', timestamp: 'Jun 16',
-
-    type: 'project',
-    category: 'Builds',
-    subcategory: 'Web',
-    tags: ['React', 'Vite', 'CSS'],
-    title: 'College Website',
-    content: 'A website project for a college, built with React, Vite, and CSS.',
-    image: collegeImage,
-    technologies: ['React', 'Vite', 'CSS'],
-    liveUrl: 'https://college-website-kxlade.netlify.app/',
-    githubUrl: '',
-    order: 2,
-  },
-  {
-    id: 'pet-adoption-website', slug: 'pet-adoption-website',
-    publishedAt: '2026-09-14', timestamp: 'Sept 14',
-    type: 'project',
-    category: 'Builds',
-    subcategory: 'Web',
-    tags: ['React', 'Vite', 'CSS'],
-    title: 'Pet Adoption Website',
-    content: 'A pet adoption website project, built with React, Vite, and CSS.',
-    image: petAdoptionImage,
-    technologies: ['React', 'Vite', 'CSS'],
-    liveUrl: 'https://petadoption-by-kolade.netlify.app/',
-    githubUrl: '',
-    order: 3,
-  },
-  {
-    id: 'e-resturant', slug: 'e-resturant',
-    publishedAt: '2026-07-10', timestamp: 'Jul 10',
-    type: 'project',
-    category: 'Builds',
-    subcategory: 'Web',
-    tags: ['React', 'Vite', 'CSS'],
-    title: 'E. Resturant',
-    content: 'A restaurant website project, built with React, Vite, and CSS.',
-    technologies: ['React', 'Vite', 'CSS'],
-    image: resturantImage,
-    liveUrl: 'https://resturant-flame-eight.vercel.app/',
-    githubUrl: '',
-    order: 4,
-  },
-]
-
 const readingPosts = bookCandidates.map((book, index) => ({
   ...book,
-  order: projects.length + index + 1,
+  order: index + 5,
 }))
 
 // Resource visits below are based on study-related pages found in Chrome and
@@ -151,7 +77,7 @@ const learningResources = [
   },
   {
     id: 'starting-out-with-racket', type: 'resource', category: 'Learning', order: 0,
-    date: '2026-6-28', timestamp: 'Jun 28', title: 'Starting out with Racket',
+    date: '2026-06-28', timestamp: 'Jun 28', title: 'Starting out with Racket',
     content: 'Working through an introduction to Racket and functional programming.',
     url: 'https://cs.uwaterloo.ca/~plragde/flane/FICS/Starting_out_with_Racket.html', tags: ['Racket', 'Programming'], draft: true,
   },
@@ -159,10 +85,10 @@ const learningResources = [
 
 const orderedLearningPosts = learningResources.map((post, index) => ({
   ...post,
-  order: projects.length + bookCandidates.length + index + 1,
+  order: bookCandidates.length + index + 5,
 }))
 
-export const posts = [...projects, ...readingPosts, ...orderedLearningPosts].map((post) => {
+export const nonProjectPosts = [...readingPosts, ...orderedLearningPosts].map((post) => {
   const { date, live, github, ...normalizedPost } = post
   return {
     ...normalizedPost,
@@ -172,3 +98,7 @@ export const posts = [...projects, ...readingPosts, ...orderedLearningPosts].map
     githubUrl: post.githubUrl || github,
   }
 })
+
+export function getNonProjectPostBySlug(slug) {
+  return nonProjectPosts.find((post) => post.slug === slug)
+}
