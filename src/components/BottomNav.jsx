@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 
 const mobileNavItems = [
   { label: 'Home', icon: 'home', href: '/' },
+  { label: 'Github', icon: 'github', href: 'https://github.com/kxlade' },
   { label: 'About', icon: 'user', href: '/about' },
 ]
 

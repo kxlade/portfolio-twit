@@ -17,10 +17,15 @@ export const profile = {
 export const categories = ['All', 'Builds', 'Personal', 'Reading', 'Learning', 'Dev Log']
 export const buildSubcategories = ['Web', 'Backend', 'Full-stack', 'Case Studies']
 
+// Keep UI components independent from the current in-memory data source.
+export function getPosts() { return posts }
+export function getPostBySlug(slug) { return posts.find((post) => post.slug === slug) }
+
 // Keep order explicit: no invented publication dates are needed for this portfolio feed.
 const projects = [
   {
-    id: 'origami-for-all',
+    id: 'origami-for-all', slug: 'origami-for-all',
+    publishedAt: '2026-10-18', timestamp: 'Oct 18',
     type: 'project',
     category: 'Builds',
     subcategory: 'Web',
@@ -29,13 +34,15 @@ const projects = [
     content: 'An origami website made to share the art of paper folding. Built with React, Vite, and CSS.',
     image: origamiImage,
     technologies: ['React', 'Vite', 'CSS'],
-    live: 'https://origami-folder.vercel.app/',
-    github: '',
+    liveUrl: 'https://origami-folder.vercel.app/',
+    githubUrl: '',
     pinned: true,
     order: 1,
   },
   {
-    id: 'college-website',
+    id: 'college-website', slug: 'college-website',
+    publishedAt: '2026-06-16', timestamp: 'Jun 16',
+
     type: 'project',
     category: 'Builds',
     subcategory: 'Web',
@@ -44,12 +51,13 @@ const projects = [
     content: 'A website project for a college, built with React, Vite, and CSS.',
     image: collegeImage,
     technologies: ['React', 'Vite', 'CSS'],
-    live: 'https://college-website-kxlade.netlify.app/',
-    github: '',
+    liveUrl: 'https://college-website-kxlade.netlify.app/',
+    githubUrl: '',
     order: 2,
   },
   {
-    id: 'pet-adoption-website',
+    id: 'pet-adoption-website', slug: 'pet-adoption-website',
+    publishedAt: '2026-09-14', timestamp: 'Sept 14',
     type: 'project',
     category: 'Builds',
     subcategory: 'Web',
@@ -58,12 +66,13 @@ const projects = [
     content: 'A pet adoption website project, built with React, Vite, and CSS.',
     image: petAdoptionImage,
     technologies: ['React', 'Vite', 'CSS'],
-    live: 'https://petadoption-by-kolade.netlify.app/',
-    github: '',
+    liveUrl: 'https://petadoption-by-kolade.netlify.app/',
+    githubUrl: '',
     order: 3,
   },
   {
-    id: 'e-resturant',
+    id: 'e-resturant', slug: 'e-resturant',
+    publishedAt: '2026-07-10', timestamp: 'Jul 10',
     type: 'project',
     category: 'Builds',
     subcategory: 'Web',
@@ -72,8 +81,8 @@ const projects = [
     content: 'A restaurant website project, built with React, Vite, and CSS.',
     technologies: ['React', 'Vite', 'CSS'],
     image: resturantImage,
-    live: 'https://resturant-flame-eight.vercel.app/',
-    github: '',
+    liveUrl: 'https://resturant-flame-eight.vercel.app/',
+    githubUrl: '',
     order: 4,
   },
 ]
@@ -94,9 +103,9 @@ const learningResources = [
   },
   {
     id: 'learning-discrete-maths', type: 'thought', category: 'Learning', order: 0,
-    date: '2026-10-27', timestamp: '4 days ago',
+    date: '2026-10-31', timestamp: 'Oct 31',
     content: 'Learning discrete maths today 🥲 logic and proofs are a different kind of workout.',
-    draft: true,
+    draft: false,
   },
   {
     id: 'learn-anything', type: 'resource', category: 'Learning', order: 0,
@@ -106,7 +115,7 @@ const learningResources = [
   },
   {
     id: 'freecodecamp-csharp', type: 'resource', category: 'Learning', order: 0,
-    date: '2026-10-31', timestamp: 'Oct 31', title: 'freeCodeCamp · C#',
+    date: '2026-10-16', timestamp: 'Oct 16', title: 'freeCodeCamp · C#',
     content: 'Today’s study rabbit hole: learning the basics of storing data with C#.',
     url: 'https://www.freecodecamp.org/learn/foundational-c-sharp-with-microsoft/write-your-first-code-using-c-sharp/perform-basic-operations-on-numbers-in-c-sharp', tags: ['C#', 'Programming'], draft: true,
   },
@@ -132,7 +141,7 @@ const learningResources = [
     id: 'w3schools-react-router', type: 'resource', category: 'Learning', order: 0,
     date: '2026-10-30', timestamp: 'Oct 30', title: 'W3Schools · React Router',
     content: 'A quick reference while working through React Router navigation.',
-    url: 'https://www.w3schools.com/react/react_router.asp', tags: ['React', 'Routing'], draft: true,
+    url: 'https://www.w3schools.com/react/react_router.asp', tags: ['React', 'Routing'], draft: false,
   },
   {
     id: 'compscilib-discrete-math', type: 'resource', category: 'Learning', order: 0,
@@ -153,4 +162,13 @@ const orderedLearningPosts = learningResources.map((post, index) => ({
   order: projects.length + bookCandidates.length + index + 1,
 }))
 
-export const posts = [...projects, ...readingPosts, ...orderedLearningPosts]
+export const posts = [...projects, ...readingPosts, ...orderedLearningPosts].map((post) => {
+  const { date, live, github, ...normalizedPost } = post
+  return {
+    ...normalizedPost,
+    slug: post.slug || post.id,
+    publishedAt: post.publishedAt || date,
+    liveUrl: post.liveUrl || live,
+    githubUrl: post.githubUrl || github,
+  }
+})

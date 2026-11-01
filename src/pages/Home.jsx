@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Navbar from '../components/Navbar'
 import PostFeed from '../components/PostFeed'
-import { posts } from '../data/posts'
+import { getPosts } from '../data/posts'
 
 export default function Home() {
   const [active, setActive] = useState('All')
@@ -12,15 +12,20 @@ export default function Home() {
     setActiveBuildFilter(null)
   }
 
-  const visible = posts
-    .filter((post) => active === 'All' || post.category === active)
-    .filter((post) => active !== 'Builds' || !activeBuildFilter || post.subcategory === activeBuildFilter)
-    .map((post, index) => ({ post, index }))
-    .sort((a, b) => {
-      if (active !== 'All' && a.post.pinned !== b.post.pinned) return a.post.pinned ? -1 : 1
-      return a.post.order - b.post.order || a.index - b.index
-    })
-    .map(({ post }) => post)
+const visible = [...getPosts()]
+  .filter((post) =>
+    (active === 'All' || post.category === active) &&
+    (active !== 'Builds' || !activeBuildFilter || post.subcategory === activeBuildFilter)
+  )
+  .sort((a, b) => {
+    if (a.pinned !== b.pinned) {
+      return Number(b.pinned) - Number(a.pinned)
+    }
+
+    const aDate = a.publishedAt ? new Date(a.publishedAt).getTime() : 0
+    const bDate = b.publishedAt ? new Date(b.publishedAt).getTime() : 0
+    return bDate - aDate
+  })
 
   return (
     <>

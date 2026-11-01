@@ -1,5 +1,14 @@
 # React + Vite
 
+## Project structure
+
+- `src/`, `public/`, and the root `package.json` contain the React + Vite frontend.
+- `server/src/` is reserved for the future Node.js + Express backend.
+- `server/prisma/` is reserved for future Prisma schema and migration files.
+- `server/package.json` keeps backend scripts and dependencies separate from the frontend.
+
+The backend directories are scaffolding only; no server, database schema, or backend dependencies are configured yet.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
