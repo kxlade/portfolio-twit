@@ -3,17 +3,25 @@ import { NavLink } from 'react-router-dom'
 
 const mobileNavItems = [
   { label: 'Home', icon: 'home', href: '/' },
-  { label: 'Github', icon: 'github', href: 'https://github.com/kxlade' },
   { label: 'About', icon: 'user', href: '/about' },
+  { label: 'GitHub', icon: 'github', href: 'https://github.com/kxlade', external: true }
 ]
 
 export default function BottomNav() {
   return (
     <nav className="bottom-nav" aria-label="Main">
       {mobileNavItems.map((item) => (
-        <NavLink key={item.label} to={item.href} end={item.href === '/'} aria-label={item.label}>
-          <Icon name={item.icon} size={24} />
-        </NavLink>
+        item.external ? (
+          <a key={item.label} href={item.href} target="_blank" rel="noreferrer" aria-label={item.label}>
+            <Icon name={item.icon} size={21} />
+            <span>{item.label}</span>
+          </a>
+        ) : (
+          <NavLink key={item.label} to={item.href} end={item.href === '/'} aria-label={item.label}>
+            <Icon name={item.icon} size={21} />
+            <span>{item.label}</span>
+          </NavLink>
+        )
       ))}
     </nav>
   )
