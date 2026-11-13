@@ -1,4 +1,4 @@
-import { bookCandidates } from './books'
+import { bookCandidates } from './books.js'
 
 export const profile = {
   name: 'Kolade',

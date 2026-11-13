@@ -2,21 +2,27 @@ import { useEffect, useMemo, useState } from 'react'
 import Navbar from '../components/Navbar'
 import PostFeed from '../components/PostFeed'
 import { nonProjectPosts } from '../data/posts'
-import { fetchProjects } from '../services/projectService'
+import { fetchProjects, getFallbackProjects } from '../services/projectService'
 
 export default function Home() {
   const [active, setActive] = useState('All')
   const [activeBuildFilter, setActiveBuildFilter] = useState(null)
-  const [projects, setProjects] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [projects, setProjects] = useState(() => getFallbackProjects())
   const [error, setError] = useState('')
 
   useEffect(() => {
     let isCurrent = true
     fetchProjects()
-      .then((items) => { if (isCurrent) setProjects(items) })
-      .catch((requestError) => { if (isCurrent) setError(requestError.message) })
-      .finally(() => { if (isCurrent) setLoading(false) })
+      .then((items) => {
+        if (isCurrent && Array.isArray(items)) {
+          setProjects(items)
+        }
+      })
+      .catch((requestError) => {
+        if (isCurrent) {
+          setError(requestError.message)
+        }
+      })
     return () => { isCurrent = false }
   }, [])
 
@@ -49,9 +55,12 @@ export default function Home() {
         activeBuildFilter={activeBuildFilter}
         onBuildFilterChange={setActiveBuildFilter}
       />
-      {loading && <p className="feed-empty" role="status">Loading projects…</p>}
-      {error && <p className="feed-empty" role="alert">Projects could not be loaded: {error}. Check that the API server is running, then refresh.</p>}
-      {!loading && !error && <PostFeed posts={visible} category={active} />}
+      {error && !visible.length && (
+        <p className="feed-empty" role="alert">
+          Feed could not be loaded: {error}. Check that the API server is running, then refresh.
+        </p>
+      )}
+      <PostFeed posts={visible} category={active} />
     </>
   )
 }
