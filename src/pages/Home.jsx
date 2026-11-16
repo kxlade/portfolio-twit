@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import Navbar from '../components/Navbar'
 import PostFeed from '../components/PostFeed'
 import { nonProjectPosts } from '../data/posts'
-import { fetchProjects, getFallbackProjects } from '../services/projectService'
+import { fetchProjects } from '../services/projectApi'
+import { getFallbackProjects } from '../services/projectService'
 
 export default function Home() {
   const [active, setActive] = useState('All')

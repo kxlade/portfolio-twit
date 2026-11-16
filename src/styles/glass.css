@@ -1,0 +1,385 @@
+/* =====================================================================
+   Liquid Glass (iOS-style)  -  load AFTER global.css, layout.css, posts.css
+
+   What makes it read as "liquid glass" instead of plain frosted glass:
+   1. blur + strong saturation of whatever is behind the element
+   2. a bright specular edge on the top, a faint one on the bottom
+   3. a thin gradient "rim light" ring (the ::before layer)
+   4. a soft inner glow so the surface looks thick
+   5. a highlight that follows your finger / cursor (the ::after layer)
+   6. jelly physics: squash on press, springy overshoot on release
+   ===================================================================== */
+
+:root {
+  --lg-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --lg-smooth: cubic-bezier(.22, .9, .3, 1);
+
+  --lg-fill: linear-gradient(155deg,
+      rgba(255, 255, 255, .22) 0%,
+      rgba(255, 255, 255, .07) 42%,
+      rgba(255, 255, 255, .04) 62%,
+      rgba(255, 255, 255, .14) 100%);
+  --lg-fill-strong: linear-gradient(155deg,
+      rgba(255, 255, 255, .34) 0%,
+      rgba(255, 255, 255, .13) 45%,
+      rgba(255, 255, 255, .08) 62%,
+      rgba(255, 255, 255, .24) 100%);
+
+  --lg-edge:
+    inset 0 1px .5px rgba(255, 255, 255, .6),
+    inset 0 -1px .5px rgba(255, 255, 255, .22),
+    inset 1px 0 .5px rgba(255, 255, 255, .2),
+    inset -1px 0 .5px rgba(255, 255, 255, .2);
+  --lg-glow:
+    inset 0 0 14px rgba(255, 255, 255, .1),
+    inset 0 6px 14px rgba(255, 255, 255, .06);
+
+  --lg-shadow: var(--lg-edge), var(--lg-glow), 0 10px 26px rgba(0, 0, 0, .38), 0 2px 5px rgba(0, 0, 0, .35);
+  --lg-shadow-soft: var(--lg-edge), var(--lg-glow), 0 6px 16px rgba(0, 0, 0, .28);
+
+  --lg-filter: blur(18px) saturate(190%);
+}
+
+/* ---------- soft colour behind everything, so the glass has something to bend ---------- */
+body::after {
+  content: '';
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 35% at 15% 20%, rgba(90, 120, 255, .16), transparent 70%),
+    radial-gradient(35% 30% at 85% 30%, rgba(190, 90, 255, .12), transparent 70%),
+    radial-gradient(40% 35% at 60% 90%, rgba(40, 200, 170, .10), transparent 70%);
+}
+
+/* ---------- shared layers: rim light (::before) + pointer glow (::after) ---------- */
+.btn,
+.tab,
+.build-filter,
+.nav-link,
+.about-back,
+.engagement-action,
+.navbar,
+.bottom-nav,
+.bottom-nav-lens {
+  position: relative;
+  isolation: isolate;
+}
+
+.navbar {
+  position: sticky;
+}
+
+.bottom-nav {
+  position: fixed;
+}
+
+.bottom-nav-lens {
+  position: absolute;
+}
+
+.btn::before,
+.tab::before,
+.build-filter::before,
+.nav-link::before,
+.about-back::before,
+.engagement-action::before,
+.navbar::before,
+.bottom-nav::before,
+.bottom-nav-lens::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(140deg,
+      rgba(255, 255, 255, .75) 0%,
+      rgba(255, 255, 255, .12) 28%,
+      rgba(255, 255, 255, 0) 50%,
+      rgba(255, 255, 255, .1) 72%,
+      rgba(255, 255, 255, .5) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.btn::after,
+.tab::after,
+.build-filter::after,
+.nav-link::after,
+.about-back::after,
+.engagement-action::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(90px circle at var(--mx, 50%) var(--my, 0%),
+      rgba(255, 255, 255, .38), rgba(255, 255, 255, 0) 70%);
+  transition: opacity .3s var(--lg-smooth);
+}
+
+.btn:hover::after,
+.tab:hover::after,
+.build-filter:hover::after,
+.nav-link:hover::after,
+.about-back:hover::after,
+.engagement-action:hover::after,
+.btn:active::after,
+.tab:active::after,
+.build-filter:active::after,
+.engagement-action:active::after {
+  opacity: 1;
+}
+
+/* =====================================================================
+   1. Category tabs + build filters  (always glass)
+   ===================================================================== */
+.tab,
+.build-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0 !important;                       /* beats the old !important border in posts.css */
+  border-radius: var(--radius-pill) !important;
+  background: var(--lg-fill);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  box-shadow: var(--lg-shadow-soft);
+  filter: none;
+  color: var(--muted);
+  transition: transform .55s var(--lg-spring), color .25s ease, background .3s ease, box-shadow .3s ease;
+}
+
+.tab:hover,
+.build-filter:hover {
+  color: var(--text);
+  background: var(--lg-fill-strong);
+  transform: translateY(-1px) scale(1.04);
+  filter: none;
+  box-shadow: var(--lg-shadow);
+}
+
+.tab:active,
+.build-filter:active {
+  transform: scale(.93, .88);
+  transition-duration: .12s;
+  transition-timing-function: ease-out;
+}
+
+.tab[aria-pressed='true'],
+.build-filter[aria-pressed='true'] {
+  color: var(--text);
+  background: var(--lg-fill-strong), rgba(255, 255, 255, .08);
+  box-shadow: var(--lg-edge), inset 0 0 18px rgba(255, 255, 255, .16), 0 8px 22px rgba(0, 0, 0, .35);
+}
+
+/* =====================================================================
+   2. Primary buttons (.btn: Hire me, Get in touch, Visit website)
+   Bright "clear glass" with a cool iridescent glow under the cursor.
+   ===================================================================== */
+.btn {
+  border: 0;
+  color: var(--on-accent);
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, .98) 0%,
+      rgba(240, 241, 246, .9) 48%,
+      rgba(222, 224, 232, .86) 100%);
+  -webkit-backdrop-filter: blur(16px) saturate(200%);
+  backdrop-filter: blur(16px) saturate(200%);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -3px 6px rgba(70, 80, 120, .18),
+    inset 0 0 18px rgba(255, 255, 255, .7),
+    0 12px 30px rgba(0, 0, 0, .4),
+    0 3px 8px rgba(0, 0, 0, .3),
+    0 0 0 .5px rgba(255, 255, 255, .55);
+  transition: transform .55s var(--lg-spring), box-shadow .3s ease, filter .3s ease;
+}
+
+.btn::before {
+  background: linear-gradient(140deg,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(150, 165, 210, .35) 40%,
+      rgba(255, 255, 255, .2) 60%,
+      rgba(255, 255, 255, .9) 100%);
+}
+
+.btn::after {
+  background: radial-gradient(110px circle at var(--mx, 50%) var(--my, 0%),
+      rgba(120, 170, 255, .38), rgba(255, 160, 230, .2) 45%, rgba(255, 255, 255, 0) 72%);
+}
+
+.btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  filter: brightness(1.04) saturate(1.1);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -3px 6px rgba(70, 80, 120, .2),
+    inset 0 0 22px rgba(255, 255, 255, .85),
+    0 18px 38px rgba(0, 0, 0, .45),
+    0 4px 10px rgba(0, 0, 0, .3),
+    0 0 0 .5px rgba(255, 255, 255, .7);
+}
+
+.btn:active {
+  transform: scale(.94, .88);
+  transition-duration: .12s;
+  transition-timing-function: ease-out;
+  box-shadow:
+    inset 0 2px 5px rgba(70, 80, 120, .25),
+    inset 0 0 14px rgba(255, 255, 255, .6),
+    0 4px 12px rgba(0, 0, 0, .3);
+}
+
+/* =====================================================================
+   3. Quiet buttons: appear as glass on hover / when selected
+   (sidebar links, post actions, back arrow)
+   ===================================================================== */
+.nav-link,
+.about-back,
+.engagement-action {
+  background: transparent;
+  box-shadow: none;
+  transition: transform .55s var(--lg-spring), background .3s ease, box-shadow .3s ease, color .25s ease;
+}
+
+.nav-link:hover,
+.nav-link[aria-current='page'],
+.about-back:hover,
+.engagement-action:hover,
+.engagement-action.is-active {
+  background: var(--lg-fill);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  box-shadow: var(--lg-shadow-soft);
+}
+
+.nav-link[aria-current='page'] {
+  background: var(--lg-fill-strong);
+}
+
+.engagement-action:hover,
+.engagement-action.is-active {
+  transform: scale(1.06);
+  color: var(--text);
+}
+
+.nav-link:active,
+.about-back:active,
+.engagement-action:active {
+  transform: scale(.94, .9);
+  transition-duration: .12s;
+  transition-timing-function: ease-out;
+}
+
+.like-action.is-liked {
+  color: #ff6b83;
+}
+
+/* =====================================================================
+   4. Floating bars
+   ===================================================================== */
+.navbar,
+.navbar.is-compact {
+  border: 0;
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .04) 45%, rgba(255, 255, 255, .08)),
+    rgba(18, 19, 22, .45);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+  box-shadow: var(--lg-edge), inset 0 0 24px rgba(255, 255, 255, .06),
+    0 18px 40px rgba(0, 0, 0, .45), 0 2px 6px rgba(0, 0, 0, .4);
+}
+
+.bottom-nav {
+  inset: auto max(16px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left));
+  gap: 0;
+  padding: 6px;
+  border: 0;
+  border-radius: 32px;
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .04) 45%, rgba(255, 255, 255, .09)),
+    rgba(18, 19, 22, .5);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  backdrop-filter: blur(30px) saturate(200%);
+  box-shadow: var(--lg-edge), inset 0 0 26px rgba(255, 255, 255, .07),
+    0 20px 44px rgba(0, 0, 0, .55), 0 4px 10px rgba(0, 0, 0, .4);
+  touch-action: none;                      /* lets us handle the glide ourselves */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* the items themselves are transparent: the moving lens is the "selected" look */
+.bottom-nav a,
+.bottom-nav a[aria-current='page'],
+.bottom-nav a.active {
+  position: relative;
+  z-index: 1;
+  min-height: 52px;
+  border: 0;
+  border-radius: 26px;
+  background: none;
+  box-shadow: none;
+  color: var(--muted);
+  -webkit-tap-highlight-color: transparent;
+  transition: color .25s ease;
+}
+
+.bottom-nav a:hover,
+.bottom-nav a:active {
+  transform: none;
+  filter: none;
+}
+
+.bottom-nav a svg {
+  transition: transform .5s var(--lg-spring), filter .3s ease;
+}
+
+.bottom-nav a.is-hot {
+  color: var(--text);
+}
+
+.bottom-nav a.is-hot svg {
+  transform: translateY(-1px) scale(1.12);
+  filter: drop-shadow(0 0 7px rgba(255, 255, 255, .35));
+}
+
+/* the liquid lens that slides between the items (moved by BottomNav.jsx) */
+.bottom-nav-lens {
+  top: 0;
+  left: 0;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  border-radius: 26px;
+  will-change: transform;
+  background:
+    radial-gradient(70% 90% at 28% 0%, rgba(255, 255, 255, .42), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(165deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .06) 55%, rgba(255, 255, 255, .14));
+  /* no blur: the labels underneath must stay crisp, we only brighten them */
+  -webkit-backdrop-filter: brightness(1.25) saturate(1.7);
+  backdrop-filter: brightness(1.05) saturate(1.7);
+  box-shadow: var(--lg-edge), inset 0 0 18px rgba(255, 255, 255, .2),
+    0 8px 20px rgba(0, 0, 0, .4), 0 2px 4px rgba(0, 0, 0, .3);
+  transition: opacity .25s ease, filter .25s ease, box-shadow .25s ease;
+}
+
+.bottom-nav.is-gliding .bottom-nav-lens {
+  filter: brightness(1.12);
+  backdrop-filter: brightness(1.05) saturate(1.7) blur(2px);
+  box-shadow: var(--lg-edge), inset 0 0 22px rgba(255, 255, 255, .28),
+    0 14px 30px rgba(0, 0, 0, .5), 0 3px 6px rgba(0, 0, 0, .35);
+}
+
+/* old Windows-style helpers can't sneak back in */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .tab, .build-filter, .navbar, .bottom-nav { background-color: rgba(40, 42, 48, .92); }
+}

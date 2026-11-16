@@ -1,0 +1,82 @@
+/* =====================================================================
+   Mobile + "Add to Home Screen" (standalone / full-screen) polish
+   Load last, after glass.css
+   ===================================================================== */
+
+/* the page itself owns the dark background (so overscroll never flashes white) */
+html {
+  background: var(--ink);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overscroll-behavior-y: none;
+}
+
+body {
+  background: transparent;
+  min-height: 100vh;
+  min-height: 100dvh;               /* dvh = the REAL visible height on phones */
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;       /* removes the double-tap-to-zoom delay */
+}
+
+.shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.sidebar {
+  height: 100vh;
+  height: 100dvh;
+}
+
+.feed-col,
+.about-page,
+.individual-post-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* keep floating bars clear of the notch / Dynamic Island / status bar */
+.navbar {
+  margin-top: calc(10px + env(safe-area-inset-top, 0px));
+  top: calc(10px + env(safe-area-inset-top, 0px));
+}
+
+.about-header {
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+}
+
+@media (max-width: 700px) {
+  /* room for the floating bottom nav + the home-indicator bar */
+  .feed-col {
+    padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Only when launched from the home screen: fade the content under the translucent status bar */
+@media (display-mode: standalone) {
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 150;
+    height: calc(env(safe-area-inset-top, 0px) + 6px);
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(13, 14, 16, .96) 70%, rgba(13, 14, 16, 0));
+  }
+}

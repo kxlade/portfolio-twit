@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react'
 import { profile, categories, buildSubcategories } from '../data/posts'
-import {
-  LiquidGlassButton,
-} from '@tinymomentum/liquid-glass-react';
-import '@tinymomentum/liquid-glass-react/dist/components/LiquidGlassBase.css';
-
 
 export default function Navbar({ active, onChange, activeBuildFilter, onBuildFilterChange }) {
   const [isCompact, setIsCompact] = useState(false)
@@ -25,18 +20,7 @@ export default function Navbar({ active, onChange, activeBuildFilter, onBuildFil
       </div>
       <div className="tabs" role="group" aria-label="Filter feed by category">
         {categories.map((category) => (
-          <LiquidGlassButton
-            width={Math.max(64, category.length * 7 + 28)}
-            height={36}
-            borderRadius={28}
-            innerShadowColor="rgba(255, 255, 255, 0.72)"
-            innerShadowBlur={12}
-            innerShadowSpread={-7}
-            glassTintColor="255, 255, 255"
-            glassTintOpacity={0.1}
-            frostBlurRadius={12}
-            noiseFrequency={0.008}
-            noiseStrength={18}
+          <button
             key={category}
             type="button"
             className="tab"
@@ -44,7 +28,7 @@ export default function Navbar({ active, onChange, activeBuildFilter, onBuildFil
             onClick={() => onChange(category)}
           >
             {category}
-          </LiquidGlassButton>
+          </button>
         ))}
       </div>
       {active === 'Builds' && (

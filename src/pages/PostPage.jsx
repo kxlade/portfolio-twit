@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Post from '../components/Post'
 import { getNonProjectPostBySlug } from '../data/posts'
-import { fetchProjects, getFallbackProjectBySlug } from '../services/projectService'
+import { fetchProjects } from '../services/projectApi'
+import { getFallbackProjectBySlug } from '../services/projectService'
 
 export default function PostPage() {
   const { slug } = useParams()
