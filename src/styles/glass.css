@@ -292,7 +292,7 @@ body::after {
   background:
     linear-gradient(155deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .04) 45%, rgba(255, 255, 255, .08)),
     rgba(18, 19, 22, .45);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(3px) saturate(190%);
   backdrop-filter: blur(3px) saturate(190%);
   box-shadow: var(--lg-edge), inset 0 0 24px rgba(255, 255, 255, .06),
     0 18px 40px rgba(0, 0, 0, .45), 0 2px 6px rgba(0, 0, 0, .4);
@@ -364,7 +364,7 @@ body::after {
   background:
     radial-gradient(70% 90% at 28% 0%, rgba(255, 255, 255, .42), rgba(255, 255, 255, 0) 70%),
     linear-gradient(165deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .06) 55%, rgba(255, 255, 255, .14));
-  /* no blur: the labels underneath must stay crisp, we only brighten them */
+  /* Keep labels crisp; the refractive enhancement below adds no large blur. */
   -webkit-backdrop-filter: brightness(1.25) saturate(1.7);
   backdrop-filter: brightness(1.05) saturate(1.7);
   box-shadow: var(--lg-edge), inset 0 0 18px rgba(255, 255, 255, .2),
